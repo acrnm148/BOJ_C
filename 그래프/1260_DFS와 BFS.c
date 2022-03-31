@@ -1,14 +1,14 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h> //memset
-int arr[1001][1001];
-int visited[1001];
-int queue[1001]; // queue 이름의 배열 생성
+#include <stdlib.h> /* malloc */
+#include <string.h> /* memset */
+//int arr[1001][1001];
+//int visited[1001];
+int queue[1001]; /* queue 이름의 배열 생성 */
 int N;			 /* 정점 개수 */
 int M;			 /* 간선 개수 */
 
 /* DFS */
-void DFS(int start)
+void DFS(int start, int** arr, int* visited)
 {
 	visited[start] = 1;
 	printf("%d ", start); /* 방문한점 출력 */
@@ -18,14 +18,14 @@ void DFS(int start)
 	{
 		if (arr[start][idx] == 1 && visited[idx] == 0)
 		{
-			DFS(idx);
+			DFS(idx, arr, visited);
 		}
 		idx++;
 	}
 }
 
 /* BFS */
-void BFS(int start)
+void BFS(int start, int** arr, int* visited)
 {
 	visited[start] = 1;
 	printf("%d ", start);
@@ -63,6 +63,25 @@ int main()
 	int v;
 	scanf("%d %d %d", &N, &M, &V);
 
+	/* 인접행렬 동적할당 & 초기화 - 메모리크기를 정해주고 선언해야하는 배열에 비해 메모리 낭비를 줄일 수 있다.*/
+	int **  arr = (int **) malloc(sizeof(int)*(N+1));
+	idx = 0;
+	while (idx <= N)
+	{
+		arr[idx] = (int *)malloc(sizeof(int*)*(N+1));
+		int idx2 = 1;
+		while (idx2 <= N)
+		{
+			arr[idx][idx2] = 0;
+			idx2++;
+		}
+		idx++;
+	}
+
+	/* 방문기록 동적할당 & 초기화 */
+	int * visited = (int*) malloc(sizeof(int)*(N+1));
+	memset(visited, 0, sizeof(int)*(N+1));
+
 	/* 요소 입력 */
 	idx = 1;
 	while (idx <= M)
@@ -74,10 +93,20 @@ int main()
 	}
 
 	/* DFS로 탐색 */
-	DFS(V);
+	DFS(V, arr, visited);
 	/* 초기화 */
-	memset(visited, 0, sizeof(visited));
+	memset(visited, 0, sizeof(int)*(N+1));
 	printf("\n");
 	/* BFS로 탐색 */
-	BFS(V);
+	BFS(V, arr, visited);
+
+	/* 동적할당 해제 */
+	/*idx = 0;
+	while (idx < N)
+	{
+		free(arr[idx]);
+		idx++;
+	}*/
+	free(arr);
+	free(visited);
 }
